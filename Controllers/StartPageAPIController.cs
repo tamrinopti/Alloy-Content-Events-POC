@@ -22,8 +22,44 @@ public class StartPageAPIController : ControllerBase
         _contentVersionRepository = contentVersionRepository;
     }
 
-    [HttpPut("{contentId}/name")]
-    public IActionResult UpdatePageName(int contentId, [FromBody] UpdatePageNameRequest request)
+    [HttpPut("save/{contentId}")]
+    public IActionResult SaveContent(int contentId, [FromBody] UpdatePageNameRequest request)
+    {
+        try
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.PageName))
+            {
+                return BadRequest("Page name is required");
+            }
+
+            var contentReference = new ContentReference(contentId);
+
+            if (!_contentRepository.TryGet<StartPage>(contentReference, out var startPage))
+            {
+                return NotFound($"StartPage with ID {contentId} not found");
+            }
+
+            var writableStartPage = startPage.CreateWritableClone() as StartPage;
+            writableStartPage.Name = request.PageName.Trim();
+
+            _contentRepository.Save(writableStartPage, EPiServer.DataAccess.SaveAction.CheckOut, AccessLevel.NoAccess);
+
+            return Ok(new
+            {
+                Success = true,
+                Message = "Saved successfully",
+                ContentId = contentId,
+                NewName = writableStartPage.Name
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "An error occurred while updating the page name");
+        }
+    }
+
+    [HttpPut("publish/{contentId}")]
+    public IActionResult PublishContent(int contentId, [FromBody] UpdatePageNameRequest request)
     {
         try
         {
@@ -47,7 +83,7 @@ public class StartPageAPIController : ControllerBase
             return Ok(new
             {
                 Success = true,
-                Message = "Page name updated successfully",
+                Message = "Published successfully",
                 ContentId = contentId,
                 NewName = writableStartPage.Name
             });

@@ -75,11 +75,6 @@ public class ContentEventsLoggingModule : IInitializableModule
             }
 
             _logger.Information(logMessage);
-
-            if (content is StartPage startPage)
-            {
-                _logger.Information($"[START PAGE EVENT] {eventType} - StartPage specific data logged for '{startPage.Name}'");
-            }
         }
         catch (Exception ex)
         {
