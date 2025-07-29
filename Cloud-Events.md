@@ -1,8 +1,5 @@
 ﻿# CMS Events to GCP Pub/Sub - POC Integration
 
-
-## 🎯 **What This POC Does**
-
 Publishes **CMS content events** to Google Cloud Pub/Sub:
 
 ---
@@ -60,8 +57,8 @@ Publishes **CMS content events** to Google Cloud Pub/Sub:
 ```
 📁 Your.CMS.Project/
 ├── 📁 Models/
-│   └── 📄 CloudEvent.cs                 # Event data models
+│   └── 📄 CloudEvent.cs                
 ├── 📁 Services/
-│   └── 📄 EventPublisher.cs             # Publishing logic
-└── 📄 ContentEventsModule.cs            # CMS integration
+│   └── 📄 EventPublisher.cs          
+└── 📄 ContentEventsModule.cs            
 ```
