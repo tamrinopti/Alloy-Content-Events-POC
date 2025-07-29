@@ -1,4 +1,5 @@
 using alloy_events_test.Extensions;
+using alloy_events_test.Services;
 using EPiServer.Cms.Shell;
 using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.Scheduler;
@@ -53,6 +54,8 @@ public class Startup
                 Description = "API for managing StartPage content in Episerver CMS 12",
             });
         });
+
+        services.AddSingleton<EventPublisher>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

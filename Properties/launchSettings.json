@@ -3,10 +3,11 @@
     "alloy-events-test": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:5000/",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "GOOGLE_APPLICATION_CREDENTIALS": "C:\\gcp-key.json"
+      },
+      "applicationUrl": "https://localhost:5000/"
     }
   }
 }
