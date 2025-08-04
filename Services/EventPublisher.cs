@@ -8,7 +8,7 @@ namespace alloy_events_test.Services
     public class EventPublisher : IDisposable
     {
         private readonly ILogger<EventPublisher> _logger;
-        private readonly PublisherClient? _publisher;
+        private readonly PublisherClient _publisher;
         private readonly bool _useConsole;
         private readonly string _sourceUrl;
 
@@ -132,7 +132,7 @@ namespace alloy_events_test.Services
             });
             message.Data = ByteString.CopyFromUtf8(jsonData);
 
-            var messageId = await _publisher!.PublishAsync(message);
+            var messageId = await _publisher.PublishAsync(message);
             _logger.LogInformation("Published {EventType} to GCP with ID: {MessageId}",
                 cloudEvent.Type, messageId);
         }
