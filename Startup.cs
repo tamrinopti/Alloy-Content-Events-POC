@@ -6,6 +6,7 @@ using EPiServer.Scheduler;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
 using Microsoft.OpenApi.Models;
+using sqlBlobProvider = SqlBlobProvider.src.EPiCode.SqlBlobProvider.SqlBlobProvider;
 
 namespace alloy_events_test;
 
@@ -33,6 +34,8 @@ public class Startup
             .AddAlloy()
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
+
+        services.AddBlobProvider<sqlBlobProvider>("SqlBlobProvider", defaultProvider: true);
 
         // Required by Wangkanai.Detection
         services.AddDetection();
