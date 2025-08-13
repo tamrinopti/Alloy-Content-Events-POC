@@ -5,7 +5,7 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "GOOGLE_APPLICATION_CREDENTIALS": "C:\\gcp-key.json"
+        "GOOGLE_APPLICATION_CREDENTIALS": "C:\\tamrin.json"
       },
       "applicationUrl": "https://localhost:5000/"
     }

@@ -6,10 +6,7 @@ using EPiServer.Scheduler;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
 using Microsoft.OpenApi.Models;
-using sqlBlobProvider = SqlBlobProvider.src.EPiCode.SqlBlobProvider.SqlBlobProvider;
 using GcsBlobProvider.GcsBlobProvider;
-using alloy_events_test.SqlBlobProvider.src;
-using System.Runtime;
 
 namespace alloy_events_test;
 
@@ -41,7 +38,7 @@ public class Startup
             .AddEmbeddedLocalization<Startup>();
 
         services.Configure<GcsSettings>(Configuration.GetSection("GcsSettings"));
-        services.AddBlobProvider<GcsBlobProvider.GcsBlobProvider.GcsBlobProvider>("GcsBlobProvider", defaultProvider: true);
+        services.AddBlobProvider<GcpBlobProvider>("GcsBlobProvider", defaultProvider: true);
 
         // Required by Wangkanai.Detection
         services.AddDetection();
