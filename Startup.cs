@@ -7,15 +7,20 @@ using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
 using Microsoft.OpenApi.Models;
 using sqlBlobProvider = SqlBlobProvider.src.EPiCode.SqlBlobProvider.SqlBlobProvider;
+using GcsBlobProvider.GcsBlobProvider;
+using alloy_events_test.SqlBlobProvider.src;
+using System.Runtime;
 
 namespace alloy_events_test;
 
 public class Startup
 {
     private readonly IWebHostEnvironment _webHostingEnvironment;
+    public IConfiguration Configuration { get; }
 
-    public Startup(IWebHostEnvironment webHostingEnvironment)
+    public Startup(IConfiguration configuration, IWebHostEnvironment webHostingEnvironment)
     {
+        Configuration = configuration;
         _webHostingEnvironment = webHostingEnvironment;
     }
 
@@ -35,7 +40,8 @@ public class Startup
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
 
-        services.AddBlobProvider<sqlBlobProvider>("SqlBlobProvider", defaultProvider: true);
+        services.Configure<GcsSettings>(Configuration.GetSection("GcsSettings"));
+        services.AddBlobProvider<GcsBlobProvider.GcsBlobProvider.GcsBlobProvider>("GcsBlobProvider", defaultProvider: true);
 
         // Required by Wangkanai.Detection
         services.AddDetection();
