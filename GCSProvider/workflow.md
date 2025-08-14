@@ -54,8 +54,8 @@ sequenceDiagram
    ┌──────────────────────┐
    │   Return GcpBlob     │
    └──────────┬───────────┘
-             │
-             ▼
+              │
+              ▼
    ```
 
 4. **Write Stream Creation**
@@ -74,7 +74,7 @@ sequenceDiagram
    │ CMS writes bytes to      │
    │ GcpBlobWriteStream       │
    └─────────────┬────────────┘
-                │
+                 │
                 ▼
    ```
 
@@ -131,8 +131,8 @@ sequenceDiagram
    ┌────────────────────────────┐
    │   CMS Media Request (UI)   │
    └─────────────┬──────────────┘
-                │
-                ▼
+                 │
+                 ▼
    ```
 
 2. **Blob Retrieval**
@@ -150,8 +150,8 @@ sequenceDiagram
    │  Create GcpBlob obj  │
    │  (bucket + object)   │
    └──────────┬───────────┘
-             │
-             ▼
+              │
+              ▼
    ```
 
 4. **Stream Download**
