@@ -123,8 +123,8 @@ GCSProvider/
 public class GcsSettings
 {
     public string BucketName { get; set; }
-    public string ServiceAccountKeyPath { get; set; }
     public int SignedUrlDurationMinutes { get; set; } = 60;
+    public bool UseSignedUrls { get; set; } = false;
 }
 ```
 
@@ -133,6 +133,7 @@ public class GcsSettings
 {
   "GcsSettings": {
     "BucketName": "storage-bucket-u-version",
+    "UseSignedUrls": false,
     "SignedUrlDurationMinutes": 60,
     "GcpProjectId": "rebuild-cms-sandbox"
   }
@@ -188,3 +189,30 @@ This relies on:
 - **URI Mapping**: Converts Episerver blob URIs to GCS object names seamlessly
 - **Error Handling**: Graceful handling of missing objects and network issues
 - **Metadata Support**: Preserves content type and file information
+- **Signed URLs**: Optional support for time-limited direct access to GCS objects
+
+### Signed URLs
+
+The provider supports generating signed URLs for direct client access to GCS objects, useful for:
+- Direct file downloads from frontend applications
+- CDN integration with temporary access
+- Mobile apps accessing files directly from GCS
+- Large file downloads without server bandwidth usage
+
+#### When to Use Signed URLs
+- ✅ **Use when**: Frontend needs direct blob URLs, CDN integration, large downloads, mobile apps
+- ❌ **Don't use when**: Server-side processing, always-public content, high-frequency access, simple setups
+
+#### Configuration
+Set `UseSignedUrls: true` in your configuration:
+```json
+{
+  "GcsSettings": {
+    "BucketName": "your-bucket-name",
+    "UseSignedUrls": true,
+    "SignedUrlDurationMinutes": 60
+  }
+}
+```
+
+The implementation automatically uses your `GOOGLE_APPLICATION_CREDENTIALS` environment variable for signing.

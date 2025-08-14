@@ -70,7 +70,7 @@ namespace alloy_events_test.GcsBlobProvider
         {
             ThrowIfNotAbsoluteUri(id);
             string objectName = GetObjectName(id);
-            var blob = new GcpBlob(_storageClient, _options.Value.BucketName, objectName, id);
+            var blob = new GcpBlob(_storageClient, _options.Value.BucketName, objectName, id, _options.Value);
             blob.ContentType = _mimeTypeResolver.GetMimeMapping(Path.GetFileName(id.AbsolutePath));
             return blob;
         }
