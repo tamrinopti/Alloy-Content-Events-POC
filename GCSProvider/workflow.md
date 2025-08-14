@@ -75,7 +75,7 @@ sequenceDiagram
    │ GcpBlobWriteStream       │
    └─────────────┬────────────┘
                  │
-                ▼
+                 ▼
    ```
 
 6. **Upload to GCS**
