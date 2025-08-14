@@ -7,6 +7,7 @@ using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
 using Microsoft.OpenApi.Models;
 using GcsBlobProvider.GcsBlobProvider;
+using alloy_events_test.GcsBlobProvider;
 
 namespace alloy_events_test;
 
