@@ -1,7 +1,8 @@
-﻿using alloy_events_test.GcsBlobProvider;
+﻿ using alloy_events_test.GcsBlobProvider;
 using EPiServer.Framework.Blobs;
 using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.FileProviders;
+using GcsBlobProvider.GcsBlobProvider;
 using Object = Google.Apis.Storage.v1.Data.Object;
 
 namespace GcsBlobProvider.GcsBlobProvider
@@ -11,23 +12,38 @@ namespace GcsBlobProvider.GcsBlobProvider
         private readonly StorageClient _storageClient;
         private readonly string _bucketName;
         private readonly string _objectName;
+        private readonly GcsSettings _settings;
 
         public string ContentType { get; set; }
 
-        public GcpBlob(StorageClient storageClient, string bucketName, string objectName, Uri id)
+        public GcpBlob(StorageClient storageClient, string bucketName, string objectName, Uri id, GcsSettings settings)
             : base(id)
         {
             _storageClient = storageClient;
             _bucketName = bucketName;
             _objectName = objectName;
+            _settings = settings;
         }
 
         public override Stream OpenRead()
         {
-            var memoryStream = new MemoryStream();
-            _storageClient.DownloadObject(_bucketName, _objectName, memoryStream);
-            memoryStream.Position = 0;
-            return memoryStream;
+            if (_settings.UseSignedUrls)
+            {
+                var signedUrl = GenerateSignedUrl();
+                using var httpClient = new HttpClient();
+                var response = httpClient.GetAsync(signedUrl).Result;
+                var memoryStream = new MemoryStream();
+                response.Content.CopyToAsync(memoryStream).Wait();
+                memoryStream.Position = 0;
+                return memoryStream;
+            }
+            else
+            {
+                var memoryStream = new MemoryStream();
+                _storageClient.DownloadObject(_bucketName, _objectName, memoryStream);
+                memoryStream.Position = 0;
+                return memoryStream;
+            }
         }
 
         public override Stream OpenWrite()
@@ -71,6 +87,14 @@ namespace GcsBlobProvider.GcsBlobProvider
         {
             stream.Position = 0;
             Write(stream);
+        }
+
+        private string GenerateSignedUrl()
+        {
+            var credential = Google.Apis.Auth.OAuth2.GoogleCredential.GetApplicationDefault();
+            var urlSigner = UrlSigner.FromCredential(credential);
+            var duration = TimeSpan.FromMinutes(_settings.SignedUrlDurationMinutes);
+            return urlSigner.Sign(_bucketName, _objectName, duration, HttpMethod.Get);
         }
     }
 }
