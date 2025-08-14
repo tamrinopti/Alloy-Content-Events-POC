@@ -60,10 +60,10 @@ sequenceDiagram
 
 4. **Write Stream Creation**
    ```
-   ┌────────────────────────────┐
-   │ GcpBlob.OpenWrite()        │
+   ┌─────────────────────────────┐
+   │ GcpBlob.OpenWrite()         │
    │ → returns GcpBlobWriteStream│
-   └─────────────┬──────────────┘
+   └─────────────┬───────────────┘
                  │
                  ▼
    ```
