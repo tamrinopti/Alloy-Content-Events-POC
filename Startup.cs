@@ -1,13 +1,14 @@
 using alloy_events_test.Extensions;
+using alloy_events_test.GcsBlobProvider;
 using alloy_events_test.Services;
 using EPiServer.Cms.Shell;
+using EPiServer.Cms.Shell.UI.Configurations;
 using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.Scheduler;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
-using Microsoft.OpenApi.Models;
 using GcsBlobProvider.GcsBlobProvider;
-using alloy_events_test.GcsBlobProvider;
+using Microsoft.OpenApi.Models;
 
 namespace alloy_events_test;
 
@@ -37,6 +38,11 @@ public class Startup
             .AddAlloy()
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
+
+        services.Configure<UploadOptions>(x =>
+        {
+            x.FileSizeLimit = 52_428_800; // 50MB
+        });
 
         services.Configure<GcsSettings>(Configuration.GetSection("GcsSettings"));
         services.AddBlobProvider<GcpBlobProvider>("GcsBlobProvider", defaultProvider: true);
