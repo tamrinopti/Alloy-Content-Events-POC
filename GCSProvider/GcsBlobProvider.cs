@@ -12,12 +12,16 @@ namespace alloy_events_test.GcsBlobProvider
         private StorageClient _storageClient;
         private readonly IMimeTypeResolver _mimeTypeResolver;
         private readonly IOptions<GcsSettings> _options;
+        private readonly IConfiguration _config;
 
-        public GcpBlobProvider(IMimeTypeResolver mimeTypeResolver, IOptions<GcsSettings> options)
+        public GcpBlobProvider(IMimeTypeResolver mimeTypeResolver, IOptions<GcsSettings> options, IConfiguration config)
         {
+            Console.WriteLine("GcpBlobProvider constructor called");
             _mimeTypeResolver = mimeTypeResolver;
             _options = options;
-            _storageClient = StorageClient.Create();
+            _config = config;
+            //_storageClient = StorageClient.Create();
+            _storageClient = GcsCredentialHelper.CreateStorageClient(config);
         }
 
         public override async Task InitializeAsync()
@@ -29,6 +33,7 @@ namespace alloy_events_test.GcsBlobProvider
         {
             try
             {
+
                 await _storageClient.GetBucketAsync(_options.Value.BucketName);
             }
             catch (Google.GoogleApiException ex) when (ex.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
@@ -70,7 +75,7 @@ namespace alloy_events_test.GcsBlobProvider
         {
             ThrowIfNotAbsoluteUri(id);
             string objectName = GetObjectName(id);
-            var blob = new GcpBlob(_storageClient, _options.Value.BucketName, objectName, id, _options.Value);
+            var blob = new GcpBlob(_storageClient, _options.Value.BucketName, objectName, id, _options.Value, _config);
             blob.ContentType = _mimeTypeResolver.GetMimeMapping(Path.GetFileName(id.AbsolutePath));
             return blob;
         }

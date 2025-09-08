@@ -1,8 +1,7 @@
-﻿ using alloy_events_test.GcsBlobProvider;
+﻿using alloy_events_test.GcsBlobProvider;
 using EPiServer.Framework.Blobs;
 using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.FileProviders;
-using GcsBlobProvider.GcsBlobProvider;
 using Object = Google.Apis.Storage.v1.Data.Object;
 using Google.Apis.Storage.v1.Data;
 using alloy_events_test.GCSProvider;
@@ -15,16 +14,18 @@ namespace GcsBlobProvider.GcsBlobProvider
         private readonly string _bucketName;
         private readonly string _objectName;
         private readonly GcsSettings _settings;
+        private readonly IConfiguration _config;
 
         public string ContentType { get; set; }
 
-        public GcpBlob(StorageClient storageClient, string bucketName, string objectName, Uri id, GcsSettings settings)
+        public GcpBlob(StorageClient storageClient, string bucketName, string objectName, Uri id, GcsSettings settings, IConfiguration config)
             : base(id)
         {
             _storageClient = storageClient;
             _bucketName = bucketName;
             _objectName = objectName;
             _settings = settings;
+            _config = config;
         }
 
         public override Stream OpenRead()
@@ -133,7 +134,8 @@ namespace GcsBlobProvider.GcsBlobProvider
 
         private string GenerateSignedUrl()
         {
-            var credential = Google.Apis.Auth.OAuth2.GoogleCredential.GetApplicationDefault();
+            //var credential = Google.Apis.Auth.OAuth2.GoogleCredential.GetApplicationDefault();
+            var credential = GcsCredentialHelper.GetGoogleCredentialFromEnvironment(_config);
             var urlSigner = UrlSigner.FromCredential(credential);
             var duration = TimeSpan.FromMinutes(_settings.SignedUrlDurationMinutes);
             return urlSigner.Sign(_bucketName, _objectName, duration, HttpMethod.Get);
@@ -143,7 +145,8 @@ namespace GcsBlobProvider.GcsBlobProvider
         {
             try
             {
-                var credential = Google.Apis.Auth.OAuth2.GoogleCredential.GetApplicationDefault();
+                //var credential = Google.Apis.Auth.OAuth2.GoogleCredential.GetApplicationDefault();
+                var credential = GcsCredentialHelper.GetGoogleCredentialFromEnvironment(_config);
                 var urlSigner = UrlSigner.FromCredential(credential);
                 var duration = TimeSpan.FromMinutes(_settings.SignedUrlDurationMinutes);
 
