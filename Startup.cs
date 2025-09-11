@@ -1,3 +1,4 @@
+using alloy_events_test.CMPIntegration;
 using alloy_events_test.Extensions;
 using alloy_events_test.GcsBlobProvider;
 using alloy_events_test.Services;
@@ -69,7 +70,18 @@ public class Startup
         });
 
         services.AddSingleton<EventPublisher>();
+
+        // Add CMP integration services
+        services.AddHttpClient<CmpTokenService>();
+        services.AddHttpClient<CmpIntegrationService>();
+        services.AddHttpClient<CmpTaskCompletionService>(); // Add HttpClient for the new service
+
+        services.AddScoped<ICmpTokenService, CmpTokenService>();
+        services.AddScoped<ICmpIntegrationService, CmpIntegrationService>();
+        services.AddScoped<ICmpTaskCompletionService, CmpTaskCompletionService>(); // Register the new service
+        //services.AddScoped<CmpContentEventHandler>();
     }
+
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
