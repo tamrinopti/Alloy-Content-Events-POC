@@ -29,15 +29,18 @@ namespace alloy_events_test.CMPIntegration
         private readonly HttpClient _httpClient;
         private readonly ILogger<CmpTaskCompletionService> _logger;
         private readonly IConfiguration _config;
+        private readonly ICmpTokenService _cmpTokenService;
 
         public CmpTaskCompletionService(
             HttpClient httpClient,
             ILogger<CmpTaskCompletionService> logger,
-            IConfiguration config)
+            IConfiguration config,
+            ICmpTokenService cmpTokenService)
         {
             _httpClient = httpClient;
             _logger = logger;
             _config = config;
+            _cmpTokenService = cmpTokenService;
         }
 
         public async Task<CmpTaskCompletionResult> CompleteTaskAsync(string cmpTaskId, string completionComment = null)
@@ -79,7 +82,7 @@ namespace alloy_events_test.CMPIntegration
         {
             try
             {
-                var accessToken = await GetAccessTokenAsync();
+                var accessToken = await _cmpTokenService.GetAccessTokenAsync();
                 if (string.IsNullOrEmpty(accessToken))
                 {
                     return new CmpTaskCompletionResult
@@ -219,7 +222,7 @@ namespace alloy_events_test.CMPIntegration
         {
             try
             {
-                var accessToken = await GetAccessTokenAsync();
+                var accessToken = await _cmpTokenService.GetAccessTokenAsync();
                 if (string.IsNullOrEmpty(accessToken))
                 {
                     return new CmpTaskCompletionResult
@@ -389,12 +392,6 @@ namespace alloy_events_test.CMPIntegration
             }
             
             return false;
-        }
-
-        private async Task<string> GetAccessTokenAsync()
-        {
-            // TODO: Implement OAuth token retrieval or get from configuration
-            return _config.GetValue<string>("CmpSettings:AccessToken");
         }
     }
 }

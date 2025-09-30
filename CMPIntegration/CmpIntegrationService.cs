@@ -30,6 +30,7 @@ namespace alloy_events_test.CMPIntegration
         private readonly IContentRepository _contentRepository;
         private readonly IUrlResolver _urlResolver;
         private readonly ICmpTaskCompletionService _taskCompletionService;
+        private readonly ICmpTokenService _cmpTokenService;
         private static readonly Dictionary<string, string> _contentTypeGuidCache = new();
 
         public CmpIntegrationService(
@@ -38,7 +39,8 @@ namespace alloy_events_test.CMPIntegration
             IConfiguration config,
             IContentRepository contentRepository,
             IUrlResolver urlResolver,
-            ICmpTaskCompletionService taskCompletionService)
+            ICmpTaskCompletionService taskCompletionService,
+            ICmpTokenService cmpTokenService)
         {
             _httpClient = httpClient;
             _logger = logger;
@@ -46,13 +48,14 @@ namespace alloy_events_test.CMPIntegration
             _contentRepository = contentRepository;
             _urlResolver = urlResolver;
             _taskCompletionService = taskCompletionService;
+            _cmpTokenService = cmpTokenService;
         }
 
         public async Task<CmpAttachmentResult> AttachContentToTaskAsync(string cmpTaskId, ContentReference contentRef, string contentName, string contentUrl)
         {
             try
             {
-                var accessToken = await GetAccessTokenAsync();
+                var accessToken = await _cmpTokenService.GetAccessTokenAsync();
 
                 if (string.IsNullOrEmpty(accessToken))
                 {
@@ -569,7 +572,7 @@ namespace alloy_events_test.CMPIntegration
         {
             try
             {
-                var accessToken = await GetAccessTokenAsync();
+                var accessToken = await _cmpTokenService.GetAccessTokenAsync();
                 if (string.IsNullOrEmpty(accessToken))
                     return false;
 
@@ -607,7 +610,7 @@ namespace alloy_events_test.CMPIntegration
         {
             try
             {
-                var accessToken = await GetAccessTokenAsync();
+                var accessToken = await _cmpTokenService.GetAccessTokenAsync();
                 if (string.IsNullOrEmpty(accessToken)) return null;
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -868,12 +871,6 @@ namespace alloy_events_test.CMPIntegration
             return propertyName.Contains("json") ||
                    propertyName.Contains("metadata") ||
                    propertyName.Contains("config");
-        }
-
-        private async Task<string> GetAccessTokenAsync()
-        {
-            // TODO: Implement OAuth token retrieval
-            return _config.GetValue<string>("CmpSettings:AccessToken");
         }
     }
 }

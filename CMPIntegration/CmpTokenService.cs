@@ -115,9 +115,10 @@ namespace alloy_events_test.CMPIntegration
                     var responseContent = await response.Content.ReadAsStringAsync();
                     _logger.LogTrace("OAuth2 response: {Response}", responseContent);
 
+                    // Fixed: Use SnakeCaseLower instead of CamelCase for deserialization
                     var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseContent, new JsonSerializerOptions
                     {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
                     });
 
                     if (tokenResponse != null && !string.IsNullOrEmpty(tokenResponse.AccessToken))
@@ -192,15 +193,16 @@ namespace alloy_events_test.CMPIntegration
 
         private string GetTokenUrl()
         {
-            var baseUrl = _config.GetValue<string>("CmpSettings:BaseUrl") ?? "https://api.cmp.optimizely.com/v3/";
-            
-            // Remove v3 from base URL and add OAuth endpoint
-            if (baseUrl.EndsWith("/v3/"))
-            {
-                baseUrl = baseUrl.Replace("/v3/", "/");
-            }
-            
-            return $"{baseUrl.TrimEnd('/')}/o/oauth2/v1/token";
+            //var baseUrl = _config.GetValue<string>("CmpSettings:BaseUrl") ?? "https://accounts.cmp.optimizely.com/v3/";
+
+            //// Remove v3 from base URL and add OAuth endpoint
+            //if (baseUrl.EndsWith("/v3/"))
+            //{
+            //    baseUrl = baseUrl.Replace("/v3/", "/");
+            //}
+
+            //return $"{baseUrl.TrimEnd('/')}/o/oauth2/v1/token";
+            return "https://accounts.cmp.optimizely.com/o/oauth2/v1/token";
         }
     }
 

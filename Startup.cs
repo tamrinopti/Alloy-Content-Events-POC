@@ -5,11 +5,16 @@ using alloy_events_test.Services;
 using EPiServer.Cms.Shell;
 using EPiServer.Cms.Shell.UI.Configurations;
 using EPiServer.Cms.UI.AspNetIdentity;
+using EPiServer.OptimizelyIdentity;
 using EPiServer.Scheduler;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
 using GcsBlobProvider.GcsBlobProvider;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.OpenApi.Models;
+using Optimizely.Cms.Preview1;
+
+using Optimizely.Cms.DependencyInjection;
 
 namespace alloy_events_test;
 
@@ -35,8 +40,45 @@ public class Startup
 
         services
             .AddCmsAspNetIdentity<ApplicationUser>()
-            .AddCms()
-            .AddAlloy()
+            .AddCms();
+        #region cmp-cms-integration
+        services.AddCmsCmpPublishing();
+
+        // Allow the quick editor to be embedded into CMP via an iframe
+        services.AddAntiforgery(options => {
+            options.Cookie.SameSite = SameSiteMode.None;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        });
+
+        // If using ASP.NET Identity
+        // Allow the quick editor to be embedded into CMP via an iframe
+        services.ConfigureApplicationCookie(options => {
+            options.Cookie.SameSite = SameSiteMode.None;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        });
+
+        // If using OptiID
+        // Allow the quick editor to be embedded into CMP via an iframe
+        services.Configure<CookieAuthenticationOptions>(OptimizelyIdentityDefaults.CookieSchemeName, options => {
+            options.Cookie.SameSite = SameSiteMode.None;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        });
+        if (_webHostingEnvironment.IsProduction())
+        {
+            //services.AddCmsCloudPlatformSupport(_configuration);
+        }
+
+        if (_webHostingEnvironment.IsDevelopment())
+        {
+            // This automatically configures dev signing credentials to call Integration API
+            services.Configure<CmsServiceOptions>(o => {
+                o.AddDevelopmentSigningCredentials();
+            });
+        }
+
+        #endregion
+
+        services.AddAlloy()
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
 
@@ -76,9 +118,13 @@ public class Startup
         services.AddHttpClient<CmpIntegrationService>();
         services.AddHttpClient<CmpTaskCompletionService>(); // Add HttpClient for the new service
 
-        services.AddScoped<ICmpTokenService, CmpTokenService>();
+        services.AddSingleton<ICmpTokenService, CmpTokenService>();
         services.AddScoped<ICmpIntegrationService, CmpIntegrationService>();
         services.AddScoped<ICmpTaskCompletionService, CmpTaskCompletionService>(); // Register the new service
+        services.AddScoped<ICmpStructuredContentService, CmpStructuredContentService>();
+
+        // Register the new service
+        services.AddScoped<ICmpTaskAssetService, CmpTaskAssetService>();
         //services.AddScoped<CmpContentEventHandler>();
     }
 
@@ -98,6 +144,12 @@ public class Startup
         app.UseStaticFiles();
         app.UseRouting();
         app.UseAuthentication();
+
+        app.UseRouting();
+        app.UseCors();
+        app.UseAuthentication();
+        app.UseCmsCmpPublishingPreviewLinks();
+
         app.UseAuthorization();
 
         app.UseEndpoints(endpoints =>
